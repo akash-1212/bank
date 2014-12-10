@@ -5,13 +5,13 @@
     <title>Confirm payment</title>
 </head>
 <body>
-    uuid :  {{ uid }} <br />
-    fees :  {{ fees }} <br />
-    College account no :  {{ acct_num }} <br />
-
+    <p>Please Confirm your Payment</p>
+    of Rupees :  {{ fees }} <br />
+    from : {{ from_name }}<br/>
+    to : {{ to_name }}<br/>
     <form action="/vasubank/payment/" method="POST">
         {% csrf_token %}
-        <button id="submit" value="Pay">Pay Now</button>
+        <button id="submit" value="Pay">Confirm Payment</button>
     </form>
 </body>
 </html>

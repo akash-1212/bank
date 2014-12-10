@@ -1,6 +1,7 @@
+import hashlib
 import random
-
 from decimal import Decimal
+
 from django import forms
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, HttpResponse
@@ -9,7 +10,7 @@ from django.template import RequestContext
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
-from vasubank.models import transaction, temporary, account, account_user_map, temp_user_map, account_inst_map
+from vasubank.models import transaction, temporary, account_user_map, temp_user_map, account_inst_map
 
 
 class LoginForm(forms.Form):
@@ -62,21 +63,33 @@ def TransactionInitialise(request):
     id = request.POST.get('uid')
     fee = request.POST.get('fees')
     college_id = request.POST.get('college_id')
-    print(college_id)
-    acct =  account_inst_map.objects.filter(institute_id=college_id)[0].account_no
-    # acct = account.objects.get(pk=acc_no)
-    # user=uuid.uuid()
-    print(id)
-    temp = temporary(uuid=id, account_no=acct, fees=fee)
-    # temp=temporary(uuid=a,accnt_num=b,fees=c,user=user)
-    temp.save()
+    hush = request.POST.get('hash')
+    m = hashlib.sha512()
+    m.update(str(id).encode('utf-8'))
+    m.update(str(fee).encode('utf-8'))
+    m.update(str(college_id).encode('utf-8'))
+    # print(hush + str(type(hush))+'         '+ m.hexdigest() + str(type(m.hexdigest())))
+    print(str(hush))
+    print(m.hexdigest())
+    if str(hush) == str(m.hexdigest()):
+        print(college_id)
+        acct = account_inst_map.objects.filter(institute_id=college_id)[0].account_no
+        # acct = account.objects.get(pk=acc_no)
+        # user=uuid.uuid()
+        print(id)
+        temp = temporary(uuid=id, account_no=acct, fees=fee)
+        # temp=temporary(uuid=a,accnt_num=b,fees=c,user=user)
+        temp.save()
+        context = {
+            'id': id,
+            'form': LoginForm()
+        }
+        return render_to_response('vasubank/payment_login.html', context, context_instance=RequestContext(request))
+
     context = {
-        'id': id,
-        'form': LoginForm()
+        'message': 'DATA has been Tempered.',
     }
-    return render_to_response('vasubank/payment_login.html', context, context_instance=RequestContext(request))
-    # else:
-    #     return render_to_response('vasubank/invalid_trans.html')
+    return render_to_response('vasubank/invalid_trans.html', context, context_instance=RequestContext(request))
 
 
 def TransactionDetails(request):
@@ -92,10 +105,12 @@ def TransactionDetails(request):
     if user is not None:
         login(request, user)
         temp_obj = temporary.objects.filter(uuid=id)[0]
+        print(str(user.username))
+        act_obj = account_user_map.objects.filter(user=user)[0].account_no.cust_id.cust_name
         context = {
-            'id': id,
+            'from_name': act_obj,
+            'to_name': temp_obj.account_no.cust_id.cust_name,
             'fees': temp_obj.fees,
-            'acct_num': temp_obj.account_no.account_no
         }
         temp_user_obj = temp_user_map(user=user, temp=temp_obj).save()
         return render_to_response('vasubank/details.html', context, context_instance=RequestContext(request))
@@ -118,14 +133,14 @@ def Payment(request):
     if request.user.is_authenticated():
         login_user = account_user_map.objects.filter(user=request.user)[0]
         temp_user_map_obj = temp_user_map.objects.filter(user=request.user)[0]
-        temp_user_map_obj.delete()
         temp_obj = temp_user_map_obj.temp
+        temp_user_map_obj.delete()
         bank_acc = temp_obj.account_no
         cust_acc = login_user.account_no
         amt=Decimal(temp_obj.fees)
         t_t='F'
         t_s=0
-        trans_id=randomword()#random
+        trans_id = 'TXN' + randomword()  # random
         # cust = account.objects.get(account_no=cust_acc)
         if cust_acc is not None:
             if cust_acc.balance>amt:
@@ -149,6 +164,7 @@ def Payment(request):
                 else:
                     t_s=3
             else:
+
                 t_s=3
         else:
             t_s=3

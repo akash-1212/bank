@@ -34,7 +34,7 @@ class transaction(models.Model) :
     account_to=models.CharField(max_length=12)
     transaction_type=models.CharField(max_length=1,choices=TRANSACTION_TYPE)
     transaction_status=models.CharField(max_length=1,choices=TRANSACTION_STATUS,default=None)
-    transaction_id=models.CharField(max_length=15,unique=True)
+    transaction_id=models.CharField(max_length=35,unique=True)
 
 class account_user_map(models.Model) :
     account_no = models.ForeignKey(account, related_name='account_map')
