@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirm payment</title>
+</head>
+<body>
+    uuid :  {{ uid }} <br />
+    fees :  {{ fees }} <br />
+    College account no :  {{ acct_num }} <br />
+
+    <form action="/vasubank/payment/" method="POST">
+    <input id="submit" type="button" value="Pay" />
+</form>
+</body>
+</html>
