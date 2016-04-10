@@ -61,7 +61,7 @@ def TransactionDetails(request):
         }
         return render_to_response('vasubank/details.html',context,context_instance=RequestContext(request))
     else:
-        return render('vasubank/invalid_trans.html')
+        return render_to_response('vasubank/invalid_trans.html')
 
 def Payment(request):
     if request.user.is_authenticated():
@@ -103,7 +103,7 @@ def Payment(request):
         print args
         return render_to_response('vasubank/payment_status.html',args)
     else:
-        return render('vasubank/invalid_trans.html')
+        return render_to_response('vasubank/invalid_trans.html')
 
 
 #print str(request.POST.get('uid'))
