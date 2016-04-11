@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+</head>
+<body>
+<div id="st-container" class="st-container">
+    {% block content %}
+    <h1>Student Login</h1>
+    <form action="/vasubank/login/" method="post">
+        {% csrf_token %}
+        {% if form.errors %}
+        <p>Invalid Credentials</p>
+        {% endif %}
+        <input placeholder='Login ID' type='text' name="username">
+        <input placeholder='Password' type='password' name="password">
+        <button type="submit">LOGIN</button>
+    </form>
+    {% endblock %}
+</div>
+</body>
+</html>

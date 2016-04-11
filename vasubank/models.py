@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 
+from decimal import Decimal
+
 from django.contrib.auth.models import User
 from django.db import models
-from django.utils import timezone
-from decimal import Decimal
 
 class customer(models.Model) :
     GENDER_CHOICES =( ('M','Male'),('F','Female'),)
@@ -36,14 +36,20 @@ class transaction(models.Model) :
     transaction_status=models.CharField(max_length=1,choices=TRANSACTION_STATUS,default=None)
     transaction_id=models.CharField(max_length=15,unique=True)
 
-class garbage(models.Model) :
-    account_no=models.ForeignKey(account)
-    user=models.ForeignKey(User)
+class account_user_map(models.Model) :
+    account_no = models.ForeignKey(account, related_name='account_map')
+    user = models.ForeignKey(User, related_name='user_map')
+
+class account_inst_map(models.Model):
+    institute_id = models.CharField(max_length=25)
+    account_no = models.ForeignKey(account)
 
 class temporary(models.Model) :
     uuid=models.CharField(max_length=25)
     account_no=models.ForeignKey(account)
     fees=models.CharField(max_length=8)
-    user=models.ForeignKey(User)
+    # user=models.CharField(max_length=50)
 
-
+class temp_user_map(models.Model) :
+    temp = models.ForeignKey(temporary)
+    user = models.ForeignKey(User)

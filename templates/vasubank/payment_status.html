@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vasubank Payment</title>
+    <script>
+        window.setInterval(function(){
+          document.forms['redirectmerchant'].submit()
+        }, 5000);
+
+    </script>
+</head>
+<body>
+    {% block content %}
+        {% if status == 2 %}
+            <p>Transaction Successful redirecting in 5 sec</p>
+        {% else %}
+            <p>Your Transaction has Failled!!! redirecting to merchants site in 5 sec</p>
+        {% endif %}
+    {% endblock %}
+
+    <form name="redirectmerchant" method="post" action="http://127.0.0.1:8089/insti/paymentfinishredirect/">
+
+    <br>
+    <input type="hidden" name="uid" value={{ uid }}><br>
+    <input type="hidden" name="status" value={{ status }}><br>
+    <input type="hidden" name="t_id" value={{ t_id }}><br>
+    <br><br>
+
+    </form>
+
+
+</body>
+</html>

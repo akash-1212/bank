@@ -10,7 +10,8 @@
     College account no :  {{ acct_num }} <br />
 
     <form action="/vasubank/payment/" method="POST">
-    <input id="submit" type="button" value="Pay" />
-</form>
+        {% csrf_token %}
+        <button id="submit" value="Pay">Pay Now</button>
+    </form>
 </body>
 </html>
