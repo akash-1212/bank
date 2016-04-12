@@ -14,7 +14,7 @@
         {% if status == 2 %}
             <p>Transaction Successful redirecting in 5 sec</p>
         {% else %}
-            <p>Your Transaction has Failled!!! redirecting to merchants site in 5 sec</p>
+            <p>Your Transaction has Failed!!! redirecting to merchants site in 5 sec</p>
         {% endif %}
     {% endblock %}
 
@@ -24,6 +24,7 @@
     <input type="hidden" name="uid" value={{ uid }}><br>
     <input type="hidden" name="status" value={{ status }}><br>
     <input type="hidden" name="t_id" value={{ t_id }}><br>
+    <input type="hidden" name="hash" value={{ hash }}><br>
     <br><br>
 
     </form>
