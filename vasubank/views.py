@@ -12,7 +12,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
 from vasubank.models import transaction, temporary, account_user_map, temp_user_map, account_inst_map
-
+from . import key
 
 class LoginForm(forms.Form):
     username = forms.CharField(label=(u'username'))
@@ -91,9 +91,12 @@ def TransactionInitialise(request):
     print(m.hexdigest())
     if str(hush) == str(m.hexdigest()):
         print(college_id)
+        college_id=key.decrypt(college_id)
         acct = account_inst_map.objects.filter(institute_id=college_id)[0].account_no
         # acct = account.objects.get(pk=acc_no)
         # user=uuid.uuid()
+        id=key.decrypt(id)
+        fee=key.decrypt(fee)
         print(id)
         temp = temporary(uuid=id, account_no=acct, fees=fee)
         # temp=temporary(uuid=a,accnt_num=b,fees=c,user=user)
