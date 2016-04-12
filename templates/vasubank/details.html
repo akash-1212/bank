@@ -11,7 +11,12 @@
     to : {{ to_name }}<br/>
     <form action="/vasubank/payment/" method="POST">
         {% csrf_token %}
-        <button id="submit" value="Pay">Confirm Payment</button>
+        <button id="pay-btn" value="Pay">Confirm Payment</button>
+    </form>
+
+    <form action="/vasubank/cancelpayment/" method="POST">
+        {% csrf_token %}
+        <button id="cancel-btn" value="Pay">Cancel Payment</button>
     </form>
 </body>
 </html>

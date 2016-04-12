@@ -13,6 +13,8 @@
     {% block content %}
         {% if status == 2 %}
             <p>Transaction Successful redirecting in 5 sec</p>
+        {% elif status == 3 %}
+            <p>Transaction has been Cancelled redirecting to merchant's site in 5 sec</p>
         {% else %}
             <p>Your Transaction has Failled!!! redirecting to merchants site in 5 sec</p>
         {% endif %}

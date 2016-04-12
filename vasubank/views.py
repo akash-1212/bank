@@ -4,7 +4,8 @@ from decimal import Decimal
 
 from django import forms
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponseRedirect, HttpResponse
+from django.db.models import Q
+from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils import timezone
@@ -26,7 +27,7 @@ def randomword():
 # @csrf_exempt
 def LoginRequest(request):
     if request.user.is_authenticated():
-        return HttpResponse('<script type="text/javascript">window.opener.location.reload(false);</script>')
+        return HttpResponseRedirect('/vasubank/history')
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -35,8 +36,7 @@ def LoginRequest(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                return HttpResponse(
-                    '<script type="text/javascript">window.close();window.opener.location.reload(false);</script>')
+                return HttpResponseRedirect('/vasubank/history')
             else:
                 errors = form._errors.setdefault("no_field", form.error_class())
                 errors.append("validation Error")
@@ -55,6 +55,24 @@ def LogoutRequest(request):
     if request.user.is_authenticated():
         logout(request)
         return HttpResponseRedirect('/')
+
+
+def print_history(request):
+    if request.user.is_authenticated():
+        print("in post")
+        login_user = account_user_map.objects.filter(user=request.user)[0]
+        cust_acc = login_user.account_no
+        trans = transaction.objects.filter(
+            Q(account_from=cust_acc) | Q(account_to=cust_acc.account_no))  # can be taken from session
+        # print trans
+        # for t in trans:
+        print("in get")
+        args = {'trans': trans}
+        print(args)
+        return render_to_response('vasubank/print_history.html', args)
+    else:
+        HttpResponseRedirect('insti/login/')
+
 
 
 @csrf_exempt
@@ -127,6 +145,17 @@ def TransactionDetails(request):
 
         # else:
         #     return render_to_response('vasubank/invalid_trans.html')
+
+
+def CancelPayment(request):
+    if request.user.is_authenticated():
+        temp_user_map_obj = temp_user_map.objects.filter(user=request.user)[0]
+        temp_obj = temp_user_map_obj.temp
+        temp_user_map_obj.delete()
+        # temp_obj.delete()
+        args = {'status': '3', 'uid': temp_obj.uuid}
+        print(args)
+        return render_to_response('vasubank/payment_status.html', args)
 
 
 def Payment(request):

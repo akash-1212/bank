@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Previous Transactions</title>
+</head>
+<body>
+{{ message }}
+<br>
+<table>
+    <tr>
+        <th>Transaction ID</th>
+        <th>From Account</th>
+        <th>To Account</th>
+        <th>Transaction Type</th>
+        <th>Transaction Status</th>
+        <th>Transaction Time</th>
+    </tr>
+
+    {% for t in trans %}
+    <tr>
+        <td>{{t.transaction_id }}</td>
+        <td>{{t.account_from.account_no }}</td>
+        <td>{{t.account_to }}</td>
+        {% if t.transaction_type == 'F' %}
+        <td>Fund Transfer</td>
+        {% elif t.transaction_type == 'D' %}
+        <td>Deposit</td>
+        {% else %}
+        <td>Withdrawl</td>
+        {% endif %}
+
+        {% if t.transaction_status == '2' %}
+        <td>Success</td>
+        {% elif t.transaction_status == '1' %}
+        <td>Pending</td>
+        {% endif %}
+        <td>{{t.date}}</td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+
+</body>
+</html>
