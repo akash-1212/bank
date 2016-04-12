@@ -197,7 +197,13 @@ def Payment(request):
                 t_s=3
         else:
             t_s=3
-        args = {'status':t_s,'uid':temp_obj.uuid,'t_id':trans_id}
+        clg_id = account_inst_map.objects.filter(account_no=bank_acc)[0].institute_id
+        m = hashlib.sha512()
+        m.update(t_s.encode('utf-8'))
+        m.update((temp_obj.uuid).encode('utf-8'))
+        m.update(trans_id.encode('utf-8'))
+        m.update(clg_id.encode('utf-8'))
+        args = {'status':t_s,'uid':temp_obj.uuid,'t_id':trans_id,'hash':m.hexdigest()}
         print(args)
         return render_to_response('vasubank/payment_status.html',args)
     else:
