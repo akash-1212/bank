@@ -11,8 +11,9 @@ from django.template import RequestContext
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
-from vasubank.models import transaction, temporary, account_user_map, temp_user_map, account_inst_map
-from . import key
+from .models import transaction, temporary, account_user_map, temp_user_map, account_inst_map
+from . import key,clg_public_key
+from Crypto.Hash import SHA512
 
 class LoginForm(forms.Form):
     username = forms.CharField(label=(u'username'))
@@ -81,15 +82,15 @@ def TransactionInitialise(request):
     id = request.POST.get('uid')
     fee = request.POST.get('fees')
     college_id = request.POST.get('college_id')
-    hush = request.POST.get('hash')
-    m = hashlib.sha512()
+    signature = request.POST.get('hash')
+    m = SHA512.new()
     m.update(str(id).encode('utf-8'))
     m.update(str(fee).encode('utf-8'))
     m.update(str(college_id).encode('utf-8'))
     # print(hush + str(type(hush))+'         '+ m.hexdigest() + str(type(m.hexdigest())))
-    print(str(hush))
-    print(m.hexdigest())
-    if str(hush) == str(m.hexdigest()):
+    hash=m.hexdigest()
+    #print(m.hexdigest())
+    if clg_public_key.verify(hash,signature):
         print(college_id)
         college_id=key.decrypt(college_id)
         acct = account_inst_map.objects.filter(institute_id=college_id)[0].account_no
@@ -143,8 +144,6 @@ def TransactionDetails(request):
             'form': form
         }
         return render_to_response('vasubank/payment_login.html', context, context_instance=RequestContext(request))
-
-
 
         # else:
         #     return render_to_response('vasubank/invalid_trans.html')
@@ -201,12 +200,17 @@ def Payment(request):
         else:
             t_s=3
         clg_id = account_inst_map.objects.filter(account_no=bank_acc)[0].institute_id
-        m = hashlib.sha512()
+        t_s=clg_public_key.encrypt(str(t_s),32)
+        temp=clg_public_key.encrypt(str(temp_obj.uuid),32)
+        trans_id=clg_public_key.encrypt(str(trans_id),32)
+        m = SHA512.new()
         m.update(t_s.encode('utf-8'))
         m.update((temp_obj.uuid).encode('utf-8'))
         m.update(trans_id.encode('utf-8'))
         m.update(clg_id.encode('utf-8'))
-        args = {'status':t_s,'uid':temp_obj.uuid,'t_id':trans_id,'hash':m.hexdigest()}
+        hash=m.hexdigest()
+        signature=key.sign(hash,'')
+        args = {'status':t_s,'uid':temp_obj.uuid,'t_id':trans_id,'hash':signature}
         print(args)
         return render_to_response('vasubank/payment_status.html',args)
     else:
